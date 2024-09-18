@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback , useState , useRef} from 'react';
 import { BsTwitter, BsSearch } from "react-icons/bs";
-import { BiHomeCircle, BiHash, BiBell, BiEnvelope, BiBookmark, BiListUl, BiUser, BiDotsHorizontalRounded, BiImageAlt } from "react-icons/bi";
+import { BiHomeCircle, BiHash, BiBell, BiEnvelope, BiBookmark, BiListUl, BiUser, BiDotsHorizontalRounded,  BiSmile , BiImageAlt } from "react-icons/bi";
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import FeedCard from "@/components/FeedCard";
 import toast from 'react-hot-toast';
@@ -8,6 +8,11 @@ import { graphQLClient } from '@/clients/api';
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import { useCurrentUser } from '@/hooks/user';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
+
+import { AiOutlineGif } from "react-icons/ai";
+import { BsEmojiSmile } from "react-icons/bs";
+import { IoCalendarNumberOutline } from "react-icons/io5";
+import { HiOutlineLocationMarker } from "react-icons/hi";
 
 
 interface TwitterSidebarButton {
@@ -31,6 +36,25 @@ export default function Home() {
   const queryClient = useQueryClient();
 
   console.log(user);
+
+    const [selectedImage, setSelectedImage] = useState(null);
+    const fileInputRef = useRef(null);
+  
+    const handleSelectImage = useCallback(() => {
+      fileInputRef.current.click();
+    }, []);
+  
+    const handleFileChange = useCallback((event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setSelectedImage(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    }, []);
+
 
   const handleLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
     const googleToken = cred.credential;
@@ -130,15 +154,33 @@ export default function Home() {
               <textarea 
                 className="w-full text-xl placeholder-gray-600 focus:outline-none resize-none" 
                 placeholder="What's happening?"
-                rows={3}
+                rows={1}
               ></textarea>
+              {selectedImage && (
+                <div className="mt-2 relative">
+                  <img src={selectedImage} alt="Selected" className="max-w-full h-auto rounded-lg" />
+                  <button 
+                    className="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1"
+                    onClick={() => setSelectedImage(null)}
+                  >
+                    X
+                  </button>
+                </div>
+              )}
               <div className="flex justify-between items-center mt-3">
                 <div className="flex gap-2 text-blue-400">
-                  {/* <IconButton icon={<BiImageAlt />} />
+                  <IconButton icon={<BiImageAlt />} onClick={handleSelectImage} />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
                   <IconButton icon={<AiOutlineGif />} />
                   <IconButton icon={<BsEmojiSmile />} />
                   <IconButton icon={<IoCalendarNumberOutline />} />
-                  <IconButton icon={<HiOutlineLocationMarker />} /> */}
+                  <IconButton icon={<HiOutlineLocationMarker />} />
                 </div>
                 <button className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full">
                   Post
@@ -147,6 +189,9 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+
+
         <div>
           <FeedCard />
           <FeedCard />
