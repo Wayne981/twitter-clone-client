@@ -1,4 +1,4 @@
-import React, { useCallback , useState , useRef} from 'react';
+import React, { useCallback , useState ,  useEffect, useRef} from 'react';
 import { BsTwitter, BsSearch } from "react-icons/bs";
 import { BiHomeCircle, BiHash, BiBell, BiEnvelope, BiBookmark, BiListUl, BiUser, BiDotsHorizontalRounded,  BiSmile , BiImageAlt } from "react-icons/bi";
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
@@ -8,12 +8,13 @@ import { graphQLClient } from '@/clients/api';
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import { useCurrentUser } from '@/hooks/user';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
-
+import { Tweet } from "@/gql/graphql";
 import { AiOutlineGif } from "react-icons/ai";
 import { BsEmojiSmile } from "react-icons/bs";
 import { IoCalendarNumberOutline } from "react-icons/io5";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-
+import { useGetAllTweets } from "@/hooks/tweet";
+import TweetFeed from '@/components/TweetFeed';
 
 interface TwitterSidebarButton {
   title: string;
@@ -32,7 +33,22 @@ const sidebarMenuItems: TwitterSidebarButton[] = [
 ];
 
 export default function Home() {
+  const { tweets = [], isLoading, error } = useGetAllTweets();
+  const [renderedTweets, setRenderedTweets] = useState<Tweet[]>([]);
+
+
+  useEffect(() => {
+    console.log("Tweets updated:", tweets);
+    setRenderedTweets(tweets);
+  }, [tweets]);
+
   const { user } = useCurrentUser();
+  // const {tweets = []} = useGetAllTweets(); 
+
+console.log("Tweets:", tweets);
+console.log("Is loading:", isLoading);
+// console.log("Is error:", isError);
+console.log("Error:", error);
   const queryClient = useQueryClient();
 
   console.log(user);
@@ -191,12 +207,29 @@ export default function Home() {
         </div>
 
 
+        {/* <div>
+  <p>Total tweets: {tweets?.length || 0}</p>
+  {tweets && tweets.length > 0 ? (
+    tweets.map((tweet) => {
+      console.log("Rendering tweet:", tweet);
+      return tweet ? (
+        <FeedCard key={tweet.id} data={tweet as Tweet} />
+      ) : (
+        <p key={tweet.id}>Invalid tweet data</p>
+      );
+    })
+  ) : (
+    <p>No tweets available.</p>
+  )}
+</div> */}
 
-        <div>
+<TweetFeed />
+
+        {/* <div>
           <FeedCard />
           <FeedCard />
           <FeedCard />
-        </div>
+        </div> */}
       </main>
 
       {/* Right Sidebar */}
