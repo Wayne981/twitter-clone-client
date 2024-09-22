@@ -1,75 +1,9 @@
-// import React from 'react';
-// import Image from "next/image";
-// import { BiMessageRounded } from "react-icons/bi";
-// import { FaRetweet } from "react-icons/fa";
-// import { AiOutlineHeart } from "react-icons/ai";
-// import {Tweet} from "@/gql/graphql"; 
+{/* I'm forever the 21-year-old 5-year-old. I'm forever the 5-year-old of something. */}
 
-// interface FeedCardProps {
-//   data : Tweet 
-// }
-
-// const FeedCard: React.FC<FeedCardProps> = (props) => {
-//   const {data} = props 
-
-//   console.log("FeedCard data:", data);
-//   return (
-//     <div className="border-b-[1px] border-gray-400 transition-all cursor-pointer p-4">
-//       <div className="flex items-start gap-4">
-//       {data.author?.profileImageURL && <Image
-//           src={data.author.profileImageURL}
-//           alt="user-image"
-//           height={50}
-//           width={50}
-//           className="rounded-full"
-//         />} 
-//         <div className="flex-1">
-//         <p className="font-bold">{data.author?.firstName} {data.author?.lastName}</p>
-// <p className="text-gray-500">@{data.author?.firstName}{data.author?.lastName}</p>
-// <p className="mt-2">
-//   {data.content}
-// </p>
-          
-//           <div className="flex justify-between mt-4 text-gray-500">
-//             <div className="flex items-center gap-1">
-//               <BiMessageRounded className="w-5 h-5" />
-//               <span>0</span>
-//             </div>
-//             <div className="flex items-center gap-1">
-//               <FaRetweet className="w-5 h-5" />
-//               <span>0</span>
-//             </div>
-//             <div className="flex items-center gap-1">
-//               <AiOutlineHeart className="w-5 h-5" />
-//               <span>0</span>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
-//   console.log("FeedCard rendering with data:", data);
-//   return (
-//     <div className="border p-4 mb-4">
-//       <p>Content: {data.content}</p>
-//       <p>Author: {data.author?.firstName} {data.author?.lastName}</p>
-//     </div>
-//   );
-// };
-
-// export default FeedCard;
-
-    {/* I'm forever the 21-year-old 5-year-old. I'm forever the 5-year-old of something. */}
-
-
-    import React from 'react';
+import React, { useState } from 'react';
 import Image from "next/image";
-import { BiMessageRounded } from "react-icons/bi";
+import { BiMessageRounded, BiHeart } from "react-icons/bi";
 import { FaRetweet } from "react-icons/fa";
-import { AiOutlineHeart } from "react-icons/ai";
 import { Tweet } from "@/gql/graphql";
 
 interface FeedCardProps {
@@ -77,40 +11,62 @@ interface FeedCardProps {
 }
 
 const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
-  console.log("FeedCard rendering with data:", data);
+  const [isLiked, setIsLiked] = useState(false);
+
+  const toggleLike = () => setIsLiked(!isLiked);
+
   return (
-    <div className="border border-gray-600 border-r-0 border-l-0 border-b-0 p-5 hover:bg-slate-900 transition-all cursor-pointer">
-      <div className="flex space-x-3">
-        <div>
+    <div className="border-b border-gray-200 p-4 bg-white">
+      <div className="flex space-x-4">
+        <div className="flex-shrink-0">
           <Image
             src={data.author?.profileImageURL || "/default-avatar.png"}
             alt="User Avatar"
-            height={50}
-            width={50}
+            height={48}
+            width={48}
             className="rounded-full"
           />
         </div>
-        <div className="flex flex-col">
-          <div className="font-bold">
-            {data.author?.firstName} {data.author?.lastName}
+        <div className="flex-grow">
+          <div className="flex items-center space-x-2">
+            <span className="font-bold text-gray-900">
+              {data.author?.firstName} {data.author?.lastName}
+            </span>
+            <span className="text-gray-500 text-sm">
+              @{data.author?.firstName?.toLowerCase()}_{data.author?.lastName?.toLowerCase()}
+            </span>
+            <span className="text-gray-500 text-sm">·</span>
+            <span className="text-gray-500 text-sm">
+              {new Date(data.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </span>
           </div>
-          <div className="text-gray-500">
-            @{data.author?.firstName?.toLowerCase()}_{data.author?.lastName?.toLowerCase()}
-          </div>
-          <div className="mt-2">{data.content}</div>
+          <p className="mt-2 text-gray-800">{data.content}</p>
           {data.imageURL && (
-            <Image src={data.imageURL} alt="Tweet Image" height={300} width={400} className="rounded-xl mt-3" />
+            <div className="mt-3 rounded-2xl overflow-hidden border border-gray-200">
+              <Image src={data.imageURL} alt="Tweet Image" height={300} width={500} className="w-full h-auto object-cover" />
+            </div>
           )}
-          <div className="flex justify-between mt-5 text-xl items-center p-2 w-[90%]">
-            <div>
-              <BiMessageRounded />
-            </div>
-            <div>
-              <FaRetweet />
-            </div>
-            <div>
-              <AiOutlineHeart />
-            </div>
+          <div className="flex justify-between mt-4 text-gray-500 max-w-md">
+            <button className="flex items-center space-x-2">
+              <BiMessageRounded className="text-xl text-gray-500" />
+              <span className="text-sm">
+                {/* {Math.floor(Math.random() * 100)} */}
+              </span>
+            </button>
+            <button className="flex items-center space-x-2">
+              <FaRetweet className="text-xl text-gray-500" />
+              <span className="text-sm">
+                {/* {Math.floor(Math.random() * 100)} */}
+              </span>
+            </button>
+            <button className="flex items-center space-x-2" onClick={toggleLike}>
+              <BiHeart 
+                className={`text-xl ${isLiked ? 'text-red-500' : 'text-gray-500'}`} 
+              />
+              <span className={`text-sm ${isLiked ? 'text-red-500' : 'text-gray-500'}`}>
+                {/* {Math.floor(Math.random() * 1000)} */}
+              </span>
+            </button>
           </div>
         </div>
       </div>

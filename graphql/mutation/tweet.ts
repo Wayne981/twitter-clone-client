@@ -5,9 +5,9 @@ export const createTweetMutation = graphql(`#graphql
     createTweet(payload:$payload) {
 
     id 
-  
+
     }
     
     }
     
-    `)
+    `); 

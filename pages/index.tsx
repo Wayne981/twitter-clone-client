@@ -15,6 +15,7 @@ import { IoCalendarNumberOutline } from "react-icons/io5";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { useGetAllTweets } from "@/hooks/tweet";
 import TweetFeed from '@/components/TweetFeed';
+import { useCreateTweet } from '@/hooks/tweet';
 
 interface TwitterSidebarButton {
   title: string;
@@ -37,6 +38,8 @@ export default function Home() {
   const [renderedTweets, setRenderedTweets] = useState<Tweet[]>([]);
 
 
+
+
   useEffect(() => {
     console.log("Tweets updated:", tweets);
     setRenderedTweets(tweets);
@@ -51,10 +54,19 @@ console.log("Is loading:", isLoading);
 console.log("Error:", error);
   const queryClient = useQueryClient();
 
+const [content , setContent] = useState("")
+
+
+
+
+ 
+
+
   console.log(user);
 
     const [selectedImage, setSelectedImage] = useState(null);
     const fileInputRef = useRef(null);
+    const {mutate} = useCreateTweet(); 
   
     const handleSelectImage = useCallback(() => {
       fileInputRef.current.click();
@@ -70,6 +82,13 @@ console.log("Error:", error);
         reader.readAsDataURL(file);
       }
     }, []);
+
+    const handleCreateTweet = useCallback(() => {
+      if (content.trim()) {
+        mutate({ content });
+        setContent(''); // Clear the textarea after tweeting
+      }
+    }, [content, mutate]);
 
 
   const handleLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
@@ -168,11 +187,13 @@ console.log("Error:", error);
             <img src="https://pbs.twimg.com/profile_images/1537163390040150016/vQt9EE52_400x400.jpg" alt="Profile" className="w-12 h-12 rounded-full" />
             <div className="flex-grow">
               <textarea 
+              value={content} 
+              onChange={e => setContent(e.target.value)}
                 className="w-full text-xl placeholder-gray-600 focus:outline-none resize-none" 
                 placeholder="What's happening?"
                 rows={1}
               ></textarea>
-              {selectedImage && (
+             {selectedImage && (
                 <div className="mt-2 relative">
                   <img src={selectedImage} alt="Selected" className="max-w-full h-auto rounded-lg" />
                   <button 
@@ -198,9 +219,13 @@ console.log("Error:", error);
                   <IconButton icon={<IoCalendarNumberOutline />} />
                   <IconButton icon={<HiOutlineLocationMarker />} />
                 </div>
-                <button className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full">
-                  Post
-                </button>
+                <button 
+  onClick={handleCreateTweet} 
+  disabled={!content.trim()}
+  className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full disabled:opacity-50"
+>
+  Tweet
+</button>
               </div>
             </div>
           </div>
