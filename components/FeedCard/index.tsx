@@ -39,6 +39,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
             <span className="text-gray-500 text-sm">
               {new Date(data.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
+           
           </div>
           <p className="mt-2 text-gray-800">{data.content}</p>
           {data.imageURL && (
